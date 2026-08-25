@@ -604,7 +604,7 @@ footer b{color:var(--ink)}
       <span class="chip opt" title="Coins earned">🪙 <b id="hudCoins">0</b></span>
       <span class="chip" title="Level and experience">Lv <b id="hudLvl">1</b></span>
       <span id="langSlot"></span>
-      ${SPEECH_OK?`<button class="icon-btn" id="speakBtn" onclick="toggleSpeak()" title="${t("readAloud")}" aria-label="${t("readAloud")}"></button>`:""}
+      <button class="icon-btn" id="speakBtn" onclick="toggleSpeak()" title="Read aloud" aria-label="Read aloud" hidden></button>
       <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="Sound on or off" aria-label="Toggle sound">🔊</button>
       <button class="icon-btn" id="nightBtn" onclick="toggleTheme()" title="Day or night mode" aria-label="Toggle night mode" aria-pressed="false">🌙</button>
     </div>
@@ -3020,7 +3020,16 @@ function hud(){
   if(Number(lEl.textContent)!==lvl(st.xp))bump(lEl.parentElement);
   tick(sEl,st.streak);tick(cEl,st.coins);tick(lEl,lvl(st.xp));
   $("#soundBtn").textContent=st.sound?"🔊":"🔈";
-  const sb=$("#speakBtn");if(sb){sb.textContent=st.speak?"🗣️":"💬";sb.style.opacity=st.speak?"1":".55";}
+  const sb=$("#speakBtn");
+  if(sb){
+    if(!SPEECH_OK){sb.hidden=true;}
+    else{
+      sb.hidden=false;
+      sb.textContent=st.speak?"🗣️":"💬";
+      sb.style.opacity=st.speak?"1":".55";
+      sb.title=t("readAloud");sb.setAttribute("aria-label",t("readAloud"));
+    }
+  }
   const ls=$("#langSlot");if(ls)ls.innerHTML=langPicker();
   const bt=$("#buildTag");
   if(bt)bt.textContent=SOLO?ROLE_LABEL[BUILD]:"";
