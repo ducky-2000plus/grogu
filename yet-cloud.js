@@ -26,6 +26,11 @@ const sb = createClient(YET_SUPABASE_URL, YET_SUPABASE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true }
 });
 window.sb = sb;
+/* Tells index.html that a backend is attached, so the sign-in screen offers a
+   real email + password form. Without this the profile list is empty when
+   signed out — the security policies hide other people's rows, correctly —
+   and a returning user has nothing to click. */
+window.YET_CLOUD = true;
 
 /* ---------- offline queue ----------
    A write that fails because the network is down is kept and replayed.
@@ -131,6 +136,72 @@ function installCloud() {
     }).eq("id", a.id);
   };
 
+  /* ---- signing back in with email and password ---- */
+  window.cloudSignIn = async function () {
+    const email = ($("#cloudEmail")?.value || "").trim().toLowerCase();
+    const pw = $("#cloudPw")?.value || "";
+    if (!EMAIL_RE.test(email)) { gate.err = t("emailL"); return render(); }
+    if (!pw) { gate.err = t("passwordL"); return render(); }
+    gate.busy = true; gate.err = "…"; render();
+    const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+    gate.busy = false;
+    if (error) { gate.err = error.message; return render(); }
+    await loadAccounts();
+    await loadState(ACC.active);
+    gate.err = ""; gate.tab = null;
+    view = "home"; render(); hud(); armIdle();
+  };
+
+  window.cloudReset = async function () {
+    const email = ($("#cloudEmail")?.value || "").trim().toLowerCase();
+    if (!EMAIL_RE.test(email)) { gate.err = t("resetNeedsEmail"); return render(); }
+    gate.busy = true; render();
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: location.href.split("#")[0] + "#reset"
+    });
+    gate.busy = false;
+    gate.err = error ? error.message : t("resetSent");
+    render();
+  };
+
+  /* ---- Google, for grown-ups ----
+     A Google account is already verified, so a parent or admin who signs in
+     this way needs no confirmation email from us. That matters because
+     Supabase's "Confirm email" is a single global switch: it cannot be on for
+     parents and off for children. Google gives adults verification by another
+     route, so the switch can stay OFF and children sign up instantly. */
+  window.signInWithGoogle = async function (role) {
+    try{ sessionStorage.setItem("yet.pendingRole", role || "parent"); }catch(e){}
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: location.href.split("#")[0] + "#" + (role === "admin" ? "admin" : "parent"),
+        queryParams: { prompt: "select_account" }
+      }
+    });
+    if (error) toast(error.message);
+  };
+
+  /* After Google sends them back, they have an auth user but maybe no profile
+     row yet. Create one, using the role they picked before they left. */
+  async function ensureProfileAfterOAuth() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return false;
+    const { data: existing } = await sb.from("profiles").select("id").eq("id", user.id).maybeSingle();
+    if (existing) return true;
+    let role = "parent";
+    try { role = sessionStorage.getItem("yet.pendingRole") || "parent"; } catch(e) {}
+    const name = (user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name))
+      || (user.email || "Grown-up").split("@")[0];
+    const { error } = await sb.from("profiles").insert({
+      id: user.id, name: String(name).slice(0, 40),
+      role: role === "admin" ? "admin" : "parent",
+      avatar: ROLE_EM[role] || "👪", grade: "3", lang: LANG
+    });
+    try { sessionStorage.removeItem("yet.pendingRole"); } catch(e) {}
+    return !error;
+  }
+
   /* ---- auth: Supabase does the hashing, server-side ---- */
   window.submitNewProfile2 = async function () {
     if (gate.busy) return;
@@ -166,6 +237,28 @@ function installCloud() {
     st = clone(DEFAULT); st.avatar = av; st.grade = gr; st.lang = LANG;
     await save();
     enterApp();
+  };
+
+  /* A Google button, shown only where it belongs: the parent and admin tabs. */
+  window.googleRow = function (role) {
+    if (!isAdult(role)) return "";
+    return `<div style="margin:0 0 18px">
+      <button class="btn btn-ghost" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px"
+        onclick="signInWithGoogle('${role}')">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+          <path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l6.7 5.2C42.2 36.2 45 30.6 45 24z"/>
+          <path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.7-5.2c-1.9 1.3-4.4 2.2-7.8 2.2-6 0-11-4-12.8-9.4l-7 5.4C7.9 41 15.4 46 24 46z"/>
+          <path fill="#FBBC05" d="M11.2 28.3A13.9 13.9 0 0 1 10.5 24c0-1.5.3-3 .7-4.3l-7-5.4A22 22 0 0 0 2 24c0 3.5.9 6.9 2.2 9.7l7-5.4z"/>
+          <path fill="#EA4335" d="M24 10.2c3.4 0 5.7 1.5 7 2.7l5.9-5.7C33.3 3.7 29.4 2 24 2 15.4 2 7.9 7 4.2 14.3l7 5.4C13 14.2 18 10.2 24 10.2z"/>
+        </svg>
+        ${t("googleBtn")}
+      </button>
+      <p class="hint" style="text-align:center;margin-top:8px">${t("googleWhy")}</p>
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0 0">
+        <span style="flex:1;height:2px;background:var(--line)"></span>
+        <span class="mono" style="font-size:11px;color:var(--muted);letter-spacing:.1em">${t("orWord")}</span>
+        <span style="flex:1;height:2px;background:var(--line)"></span>
+      </div></div>`;
   };
 
   window.gateSignIn = async function () {
@@ -299,6 +392,13 @@ function installCloud() {
 
   /* ---- start ---- */
   flushQueue();
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const okp = await ensureProfileAfterOAuth();
+      if (okp) { await loadAccounts(); await loadState(ACC.active); view = "home"; render(); hud(); }
+    }
+  })();
   sb.auth.onAuthStateChange((event) => {
     if (event === "SIGNED_OUT") { ACC = { list: [], active: null }; st = clone(DEFAULT); render(); }
   });
