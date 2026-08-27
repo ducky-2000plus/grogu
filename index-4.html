@@ -6,9 +6,9 @@
 <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g transform="translate(100,100)"><path d="M0,0 L0,-95 A95,95 0 0,1 82.3,-47.5 Z" fill="%23E01A63"/><path d="M0,0 L82.3,-47.5 A95,95 0 0,1 82.3,47.5 Z" fill="%23FFC400"/><path d="M0,0 L82.3,47.5 A95,95 0 0,1 0,95 Z" fill="%2300B39B"/><path d="M0,0 L0,95 A95,95 0 0,1 -82.3,47.5 Z" fill="%237C4DFF"/><path d="M0,0 L-82.3,47.5 A95,95 0 0,1 -82.3,-47.5 Z" fill="%23E01A63"/><path d="M0,0 L-82.3,-47.5 A95,95 0 0,1 0,-95 Z" fill="%23FFC400"/><circle r="95" fill="none" stroke="%231B1042" stroke-width="10"/><circle r="26" fill="%23FDFBFF" stroke="%231B1042" stroke-width="8"/></g></svg>'>
 <link rel="apple-touch-icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g transform="translate(100,100)"><path d="M0,0 L0,-95 A95,95 0 0,1 82.3,-47.5 Z" fill="%23E01A63"/><path d="M0,0 L82.3,-47.5 A95,95 0 0,1 82.3,47.5 Z" fill="%23FFC400"/><path d="M0,0 L82.3,47.5 A95,95 0 0,1 0,95 Z" fill="%2300B39B"/><path d="M0,0 L0,95 A95,95 0 0,1 -82.3,47.5 Z" fill="%237C4DFF"/><path d="M0,0 L-82.3,47.5 A95,95 0 0,1 -82.3,-47.5 Z" fill="%23E01A63"/><path d="M0,0 L-82.3,-47.5 A95,95 0 0,1 0,-95 Z" fill="%23FFC400"/><circle r="95" fill="none" stroke="%231B1042" stroke-width="10"/><circle r="26" fill="%23FDFBFF" stroke="%231B1042" stroke-width="8"/></g></svg>'>
 <meta name="theme-color" content="#1B1042">
-<meta name="description" content="Free practice for kindergarten to 8th grade. 555 skills, six languages, read aloud.">
+<meta name="description" content="Free practice for kindergarten to 8th grade. 789 skills, six languages, read aloud.">
 <meta property="og:title" content="Yet — practice until it clicks">
-<meta property="og:description" content="555 skills across maths, reading, science and more. Free, no ads.">
+<meta property="og:description" content="789 skills across maths, reading, science and more. Free, no ads.">
 <meta property="og:type" content="website">
 <title>Yet — practice K–8 skills until they click</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1345,6 +1345,50 @@ lifeBudgetCalc:()=>{const inc=P([200,400,600,800,1000]),save=P([10,15,20,25]),sp
   return{q:"You have $"+inc+". You save "+save+"% and spend "+spend+"% on essentials. How much is left?",
     ans:String(left),input:1,hints:["First work out "+save+"% of "+inc+".","Then work out "+spend+"% of "+inc+" and subtract both."],
     exp:"Saved "+Math.round(inc*save/100)+", spent "+Math.round(inc*spend/100)+", leaving "+left+"."};},
+loopCount:(p)=>{const a=R(1,p.max||5),b=R(a+2,(p.max||5)+8),step=p.step||1;
+  const n=Math.floor((b-a)/step)+1;
+  return{q:t("qLoopRuns",{a,b,s:step}),ans:String(n),input:1,
+    hints:[t("hLoopCount"),t("hLoopInclusive",{a,b})],
+    exp:t("eLoopRuns",{a,b,n})};},
+boolExpr:(p)=>{const A=P([true,false]),B=P([true,false]);
+  const ops=p.hard?["AND","OR","NOT A AND","A AND NOT"]:["AND","OR"];
+  const op=P(ops);
+  let v;
+  if(op==="AND")v=A&&B; else if(op==="OR")v=A||B;
+  else if(op==="NOT A AND")v=(!A)&&B; else v=A&&(!B);
+  const shown=op==="NOT A AND"?("NOT "+A+" AND "+B):op==="A AND NOT"?(A+" AND NOT "+B):(A+" "+op+" "+B);
+  return{q:t("qBool",{e:shown}),opts:[t("wTrue"),t("wFalse")],ans:v?t("wTrue"):t("wFalse"),
+    exp:op==="AND"?t("eAnd"):op==="OR"?t("eOr"):t("eNot")};},
+binaryN:(p)=>{const max=p.max||15;const n=R(1,max);
+  return p.dir==="toDec"
+    ?{q:t("qBinary",{b:n.toString(2)}),ans:String(n),input:1,exp:t("eBinary",{b:n.toString(2),n})}
+    :{q:t("qToBinary",{n}),ans:n.toString(2),input:1,exp:t("eBinary",{b:n.toString(2),n})};},
+varTrace:()=>{const a=R(1,9),b=R(1,9),c=R(1,9);
+  const ops=P([["+","+"],["-","−"]]);
+  const val=ops[0]==="+"?a+b:a-b;
+  return{q:t("qTrace",{a,op:ops[1],b,c}),ans:String(val*c),input:1,
+    hints:[t("hTraceOrder")],exp:t("eTrace",{v:val,c,r:val*c})};},
+musBeats:(p)=>{const vals=p.hard?[["whole",4],["half",2],["quarter",1],["eighth",.5],["dotted half",3]]
+    :[["whole",4],["half",2],["quarter",1]];
+  const a=P(vals),b=P(vals);
+  const tot=a[1]+b[1];
+  return{q:t("qBeats",{a:a[0],b:b[0]}),ans:String(tot),input:1,
+    exp:t("eBeats",{a:a[0],x:a[1],b:b[0],y:b[1],t:tot})};},
+makeChange:(p)=>{const price=p.hard?R(120,4800)/100:R(20,900)/100;
+  const paid=P(p.hard?[5,10,20,50]:[1,2,5,10]).valueOf();
+  const pay=Math.max(paid,Math.ceil(price));
+  const change=Math.round((pay-price)*100)/100;
+  return{q:t("qChange",{p:price.toFixed(2),g:pay}),ans:String(change.toFixed(2)),input:1,
+    hints:[t("hChangeSub",{g:pay,p:price.toFixed(2)})],
+    exp:t("eChange",{g:pay,p:price.toFixed(2),c:change.toFixed(2)})};},
+splitBill:()=>{const people=R(2,6);const each=P([3,4,5,6,8,10,12]);
+  const total=people*each;
+  return{q:t("qSplit",{t:total,n:people}),ans:String(each),input:1,
+    hints:[t("hSplit",{n:people})],exp:t("eSplit",{t:total,n:people,e:each})};},
+daysUntil:()=>{const days=R(2,28);
+  const w=Math.floor(days/7), d=days%7;
+  return{q:t("qDaysUntil",{w,d}),ans:String(days),input:1,
+    exp:t("eDaysUntil",{w,d,n:days})};},
 bank:(p)=>{const pool=bankFor(p.b);const raw=P(pool);const parts=raw.split("|");const q=parts[0],ans=parts[1].trim();return{q,opts:shuffle(parts.slice(1).map(s=>s.trim()).filter(Boolean)),ans,exp:""};}
 };
 
@@ -1381,6 +1425,10 @@ dayStreakOne:"day streak",bestEver:"best ever",minutes:"Minutes practised",strea
 youWord:"you",newBestWeek:"That is your best week yet.",
 lastWeek:"Last week",beatLastWeek:"You have beaten last week.",chaseLastWeek:"{n} XP to beat last week.",firstWeekGoing:"This is your first week. Every question counts.",firstWeekStart:"Answer a few questions and your week starts filling in.",
 highContrast:"High contrast",contrastBlurb:"Stronger colours and heavier outlines, with the decoration turned off.",contrastOn:"High contrast on",contrastOff:"High contrast off",
+googleBtn:"Continue with Google",googleWhy:"Grown-ups only. No confirmation email needed.",orWord:"OR",
+qLoopRuns:"A loop counts from {a} to {b}, stepping by {s}. How many times does it run?",eLoopRuns:"From {a} to {b} inclusive, that is {n} turns.",hLoopCount:"Count the numbers it lands on, including both ends.",hLoopInclusive:"Do not forget {a} and {b} themselves.",qBool:"What is {e}?",wTrue:"True",wFalse:"False",eAnd:"AND is true only when both sides are true.",eOr:"OR is true when either side is true.",eNot:"NOT flips true and false, so work that out first.",qToBinary:"Write {n} in binary.",eBinary:"{b} in binary is {n} in decimal.",qTrace:"x = {a} {op} {b}, then x = x × {c}. What is x?",hTraceOrder:"Work out the first line before the second.",eTrace:"The first line makes {v}, then {v} × {c} = {r}.",
+qBeats:"A {a} note plus a {b} note — how many beats in 4/4 time?",eBeats:"A {a} note is {x} and a {b} note is {y}, so {t} beats.",
+qChange:"Something costs ${p}. You pay with ${g}. How much change?",hChangeSub:"Take {p} away from {g}.",eChange:"{g} − {p} = {c}.",qSplit:"A bill of ${t} is split evenly between {n} people. How much each?",hSplit:"Divide by {n}.",eSplit:"{t} ÷ {n} = {e}.",qDaysUntil:"Something is due in {w} weeks and {d} days. How many days is that?",eDaysUntil:"{w} × 7 + {d} = {n} days.",
 home:"Home",challenges:"Challenges",skills:"Skills",progress:"Progress",awards:"Awards",klass:"Class",
 grownups:"Grown-ups",profile:"Profile",overview:"Overview",children:"Children",assign:"Assign",summary:"Summary",
 roster:"Roster",roles:"Roles",data:"Data",
@@ -1475,6 +1523,10 @@ dayStreakOne:"día seguido",bestEver:"tu récord",minutes:"Minutos practicados",
 youWord:"tú",newBestWeek:"Es tu mejor semana hasta ahora.",
 lastWeek:"Semana pasada",beatLastWeek:"Has superado la semana pasada.",chaseLastWeek:"Te faltan {n} XP para superar la semana pasada.",firstWeekGoing:"Es tu primera semana. Cada pregunta cuenta.",firstWeekStart:"Responde algunas preguntas y tu semana empezará a llenarse.",
 highContrast:"Alto contraste",contrastBlurb:"Colores más fuertes y bordes más marcados, sin decoración.",contrastOn:"Alto contraste activado",contrastOff:"Alto contraste desactivado",
+googleBtn:"Continuar con Google",googleWhy:"Solo para adultos. No hace falta correo de confirmación.",orWord:"O",
+qLoopRuns:"Un bucle cuenta de {a} a {b} de {s} en {s}. ¿Cuántas veces se repite?",eLoopRuns:"De {a} a {b} inclusive son {n} vueltas.",hLoopCount:"Cuenta los números que toca, incluyendo los dos extremos.",hLoopInclusive:"No olvides {a} ni {b}.",qBool:"¿Cuánto es {e}?",wTrue:"Verdadero",wFalse:"Falso",eAnd:"AND solo es verdadero cuando ambos lados lo son.",eOr:"OR es verdadero cuando cualquiera de los dos lo es.",eNot:"NOT invierte verdadero y falso, así que resuélvelo primero.",qToBinary:"Escribe {n} en binario.",eBinary:"{b} en binario es {n} en decimal.",qTrace:"x = {a} {op} {b}, luego x = x × {c}. ¿Cuánto vale x?",hTraceOrder:"Resuelve la primera línea antes que la segunda.",eTrace:"La primera línea da {v}, y {v} × {c} = {r}.",
+qBeats:"Una {a} más una {b}: ¿cuántos tiempos en compás de 4/4?",eBeats:"Una {a} vale {x} y una {b} vale {y}, así que son {t} tiempos.",
+qChange:"Algo cuesta {p} $. Pagas con {g} $. ¿Cuánto te devuelven?",hChangeSub:"Resta {p} de {g}.",eChange:"{g} − {p} = {c}.",qSplit:"Una cuenta de {t} $ se reparte entre {n} personas. ¿Cuánto paga cada una?",hSplit:"Divide entre {n}.",eSplit:"{t} ÷ {n} = {e}.",qDaysUntil:"Algo vence en {w} semanas y {d} días. ¿Cuántos días son?",eDaysUntil:"{w} × 7 + {d} = {n} días.",
 home:"Inicio",challenges:"Retos",skills:"Destrezas",progress:"Progreso",awards:"Premios",klass:"Clase",
 grownups:"Adultos",profile:"Perfil",overview:"Resumen",children:"Hijos",assign:"Asignar",summary:"Informe",
 roster:"Lista",roles:"Funciones",data:"Datos",
@@ -1569,6 +1621,10 @@ dayStreakOne:"jour d’affilée",bestEver:"record",minutes:"Minutes d’entraîn
 youWord:"toi",newBestWeek:"C’est ta meilleure semaine jusqu’ici.",
 lastWeek:"Semaine dernière",beatLastWeek:"Tu as battu la semaine dernière.",chaseLastWeek:"Encore {n} XP pour battre la semaine dernière.",firstWeekGoing:"C’est ta première semaine. Chaque question compte.",firstWeekStart:"Réponds à quelques questions et ta semaine se remplira.",
 highContrast:"Contraste élevé",contrastBlurb:"Des couleurs plus franches et des contours plus épais, sans décoration.",contrastOn:"Contraste élevé activé",contrastOff:"Contraste élevé désactivé",
+googleBtn:"Continuer avec Google",googleWhy:"Réservé aux adultes. Aucun e-mail de confirmation nécessaire.",orWord:"OU",
+qLoopRuns:"Une boucle compte de {a} à {b} par pas de {s}. Combien de fois tourne-t-elle ?",eLoopRuns:"De {a} à {b} inclus, cela fait {n} tours.",hLoopCount:"Compte les nombres atteints, les deux bornes comprises.",hLoopInclusive:"N’oublie ni {a} ni {b}.",qBool:"Combien vaut {e} ?",wTrue:"Vrai",wFalse:"Faux",eAnd:"AND n’est vrai que si les deux côtés sont vrais.",eOr:"OR est vrai si l’un des deux l’est.",eNot:"NOT inverse vrai et faux : commence par là.",qToBinary:"Écris {n} en binaire.",eBinary:"{b} en binaire vaut {n} en décimal.",qTrace:"x = {a} {op} {b}, puis x = x × {c}. Que vaut x ?",hTraceOrder:"Résous la première ligne avant la seconde.",eTrace:"La première ligne donne {v}, puis {v} × {c} = {r}.",
+qBeats:"Une {a} plus une {b} : combien de temps en 4/4 ?",eBeats:"Une {a} vaut {x} et une {b} vaut {y}, donc {t} temps.",
+qChange:"Un article coûte {p} $. Tu paies avec {g} $. Combien de monnaie ?",hChangeSub:"Soustrais {p} de {g}.",eChange:"{g} − {p} = {c}.",qSplit:"Une note de {t} $ est partagée entre {n} personnes. Combien chacune ?",hSplit:"Divise par {n}.",eSplit:"{t} ÷ {n} = {e}.",qDaysUntil:"Quelque chose est dû dans {w} semaines et {d} jours. Cela fait combien de jours ?",eDaysUntil:"{w} × 7 + {d} = {n} jours.",
 home:"Accueil",challenges:"Défis",skills:"Compétences",progress:"Progrès",awards:"Récompenses",klass:"Classe",
 grownups:"Adultes",profile:"Profil",overview:"Aperçu",children:"Enfants",assign:"Attribuer",summary:"Bilan",
 roster:"Liste",roles:"Rôles",data:"Données",
@@ -1663,6 +1719,10 @@ dayStreakOne:"dia seguido",bestEver:"seu recorde",minutes:"Minutos praticados",s
 youWord:"você",newBestWeek:"Esta é sua melhor semana até agora.",
 lastWeek:"Semana passada",beatLastWeek:"Você superou a semana passada.",chaseLastWeek:"Faltam {n} XP para superar a semana passada.",firstWeekGoing:"Esta é sua primeira semana. Cada pergunta conta.",firstWeekStart:"Responda algumas perguntas e sua semana começa a encher.",
 highContrast:"Alto contraste",contrastBlurb:"Cores mais fortes e contornos mais grossos, sem decoração.",contrastOn:"Alto contraste ligado",contrastOff:"Alto contraste desligado",
+googleBtn:"Continuar com o Google",googleWhy:"Apenas para adultos. Sem e-mail de confirmação.",orWord:"OU",
+qLoopRuns:"Um laço conta de {a} até {b}, de {s} em {s}. Quantas vezes ele roda?",eLoopRuns:"De {a} até {b}, inclusive, são {n} voltas.",hLoopCount:"Conte os números alcançados, incluindo as duas pontas.",hLoopInclusive:"Não esqueça {a} nem {b}.",qBool:"Quanto é {e}?",wTrue:"Verdadeiro",wFalse:"Falso",eAnd:"AND só é verdadeiro quando os dois lados são.",eOr:"OR é verdadeiro quando qualquer lado é.",eNot:"NOT inverte verdadeiro e falso, então resolva isso primeiro.",qToBinary:"Escreva {n} em binário.",eBinary:"{b} em binário é {n} em decimal.",qTrace:"x = {a} {op} {b}, depois x = x × {c}. Quanto vale x?",hTraceOrder:"Resolva a primeira linha antes da segunda.",eTrace:"A primeira linha dá {v}, e {v} × {c} = {r}.",
+qBeats:"Uma {a} mais uma {b}: quantos tempos em 4/4?",eBeats:"Uma {a} vale {x} e uma {b} vale {y}, então são {t} tempos.",
+qChange:"Algo custa ${p}. Você paga com ${g}. Quanto de troco?",hChangeSub:"Subtraia {p} de {g}.",eChange:"{g} − {p} = {c}.",qSplit:"Uma conta de ${t} é dividida entre {n} pessoas. Quanto cada uma?",hSplit:"Divida por {n}.",eSplit:"{t} ÷ {n} = {e}.",qDaysUntil:"Algo vence em {w} semanas e {d} dias. Quantos dias são?",eDaysUntil:"{w} × 7 + {d} = {n} dias.",
 home:"Início",challenges:"Desafios",skills:"Habilidades",progress:"Progresso",awards:"Prêmios",klass:"Turma",
 grownups:"Adultos",profile:"Perfil",overview:"Resumo",children:"Filhos",assign:"Atribuir",summary:"Relatório",
 roster:"Lista",roles:"Funções",data:"Dados",
@@ -1757,6 +1817,10 @@ dayStreakOne:"天连续",bestEver:"最好纪录",minutes:"练习分钟数",strea
 youWord:"你",newBestWeek:"这是你目前最好的一周。",
 lastWeek:"上周",beatLastWeek:"你已经超过上周了。",chaseLastWeek:"再得 {n} 点经验就能超过上周。",firstWeekGoing:"这是你的第一周，每一题都算数。",firstWeekStart:"答几道题，这一周就会慢慢填满。",
 highContrast:"高对比度",contrastBlurb:"更强的颜色和更粗的边框，关闭装饰效果。",contrastOn:"已开启高对比度",contrastOff:"已关闭高对比度",
+googleBtn:"使用 Google 继续",googleWhy:"仅限家长使用，无需确认邮件。",orWord:"或",
+qLoopRuns:"一个循环从 {a} 数到 {b}，每次加 {s}。它会执行多少次？",eLoopRuns:"从 {a} 到 {b}（含两端）一共 {n} 次。",hLoopCount:"数一数它经过的数字，两端都要算。",hLoopInclusive:"别忘了 {a} 和 {b} 本身。",qBool:"{e} 的结果是什么？",wTrue:"真",wFalse:"假",eAnd:"AND 只有两边都为真时才为真。",eOr:"OR 只要有一边为真就为真。",eNot:"NOT 会把真假对调，先算它。",qToBinary:"把 {n} 写成二进制。",eBinary:"二进制 {b} 就是十进制的 {n}。",qTrace:"x = {a} {op} {b}，然后 x = x × {c}。x 是多少？",hTraceOrder:"先算第一行，再算第二行。",eTrace:"第一行得 {v}，再 {v} × {c} = {r}。",
+qBeats:"一个{a}加一个{b}，在 4/4 拍里一共几拍？",eBeats:"{a}是 {x} 拍，{b}是 {y} 拍，所以共 {t} 拍。",
+qChange:"一件东西 {p} 美元，你付了 {g} 美元。应找回多少？",hChangeSub:"用 {g} 减去 {p}。",eChange:"{g} − {p} = {c}。",qSplit:"{t} 美元的账单由 {n} 个人平分，每人多少？",hSplit:"除以 {n}。",eSplit:"{t} ÷ {n} = {e}。",qDaysUntil:"还有 {w} 周零 {d} 天到期，一共几天？",eDaysUntil:"{w} × 7 + {d} = {n} 天。",
 home:"首页",challenges:"挑战",skills:"技能",progress:"进度",awards:"奖章",klass:"班级",
 grownups:"家长",profile:"档案",overview:"总览",children:"孩子",assign:"布置",summary:"小结",
 roster:"名单",roles:"角色",data:"数据",
@@ -1851,6 +1915,10 @@ dayStreakOne:"يوم متتالٍ",bestEver:"أفضل نتيجة",minutes:"دق�
 youWord:"أنت",newBestWeek:"هذا أفضل أسبوع لك حتى الآن.",
 lastWeek:"الأسبوع الماضي",beatLastWeek:"تجاوزت الأسبوع الماضي.",chaseLastWeek:"تحتاج {n} نقطة لتتجاوز الأسبوع الماضي.",firstWeekGoing:"هذا أسبوعك الأول، وكل سؤال له قيمة.",firstWeekStart:"أجب عن بعض الأسئلة وسيبدأ أسبوعك بالامتلاء.",
 highContrast:"تباين عالٍ",contrastBlurb:"ألوان أقوى وحدود أثقل، مع إيقاف الزخرفة.",contrastOn:"تم تفعيل التباين العالي",contrastOff:"تم إيقاف التباين العالي",
+googleBtn:"المتابعة عبر Google",googleWhy:"للكبار فقط، ولا حاجة لبريد تأكيد.",orWord:"أو",
+qLoopRuns:"حلقة تعدّ من {a} إلى {b} بخطوة {s}. كم مرة تتكرّر؟",eLoopRuns:"من {a} إلى {b} شاملًا الطرفين، أي {n} مرة.",hLoopCount:"عُدّ الأعداد التي تمرّ بها، بما فيها الطرفان.",hLoopInclusive:"لا تنسَ {a} و{b} نفسيهما.",qBool:"ما ناتج {e}؟",wTrue:"صحيح",wFalse:"خطأ",eAnd:"AND لا تكون صحيحة إلا إذا صحّ الطرفان.",eOr:"OR تكون صحيحة إذا صحّ أحد الطرفين.",eNot:"NOT تعكس الصواب والخطأ، فابدأ بها.",qToBinary:"اكتب {n} بالنظام الثنائي.",eBinary:"{b} بالثنائي تساوي {n} بالعشري.",qTrace:"س = {a} {op} {b}، ثم س = س × {c}. كم تساوي س؟",hTraceOrder:"احسب السطر الأول قبل الثاني.",eTrace:"السطر الأول يعطي {v}، ثم {v} × {c} = {r}.",
+qBeats:"علامة {a} مع علامة {b} — كم نبضة في ميزان ٤/٤؟",eBeats:"{a} تساوي {x} و{b} تساوي {y}، أي {t} نبضة.",
+qChange:"سعر شيء {p} دولارًا ودفعت {g} دولارًا. كم الباقي؟",hChangeSub:"اطرح {p} من {g}.",eChange:"{g} − {p} = {c}.",qSplit:"فاتورة قيمتها {t} دولارًا تُقسم بالتساوي على {n} أشخاص. كم يدفع كل واحد؟",hSplit:"اقسم على {n}.",eSplit:"{t} ÷ {n} = {e}.",qDaysUntil:"موعد بعد {w} أسابيع و{d} أيام. كم يومًا ذلك؟",eDaysUntil:"{w} × ٧ + {d} = {n} يومًا.",
 home:"الرئيسية",challenges:"التحديات",skills:"المهارات",progress:"التقدّم",awards:"الجوائز",klass:"الصف",
 grownups:"الكبار",profile:"الملف",overview:"نظرة عامة",children:"الأبناء",assign:"إسناد",summary:"الملخّص",
 roster:"القائمة",roles:"الأدوار",data:"البيانات",
@@ -2094,7 +2162,119 @@ lifeStudy:"reading it once more the next day|reviewing;saying it out loud from m
 sciEnergy2:"energy from the Sun|solar;energy from moving air|wind;energy from falling water|hydroelectric;energy from heat inside the Earth|geothermal;energy from burning coal or oil|fossil fuels;an energy source that will run out|non-renewable",
 sciClimate:"the weather over many years|climate;gases trapping heat in the atmosphere|the greenhouse effect;the long-term warming of Earth|climate change;plants taking in carbon dioxide|carbon absorption;using less and reusing more|reducing your footprint",
 mathVocab7:"a number that cannot be written as a fraction|irrational;a number that can be written as a fraction|rational;the answer to an addition|a sum;the answer to a multiplication|a product;the answer to a subtraction|a difference;the answer to a division|a quotient;the top of a fraction|the numerator;the bottom of a fraction|the denominator",
-mathVocab8:"a letter standing for a number|a variable;a number multiplying a variable|a coefficient;a number on its own|a constant;two expressions joined by an equals sign|an equation;a statement using < or >|an inequality;the value that makes an equation true|the solution;the steepness of a line|the slope;where a line crosses the y-axis|the y-intercept"
+mathVocab8:"a letter standing for a number|a variable;a number multiplying a variable|a coefficient;a number on its own|a constant;two expressions joined by an equals sign|an equation;a statement using < or >|an inequality;the value that makes an equation true|the solution;the steepness of a line|the slope;where a line crosses the y-axis|the y-intercept",
+/* ---- social studies ---- */
+socGeo:"a very large body of salt water|an ocean;land surrounded by water on all sides|an island;a narrow strip of land joining two larger ones|an isthmus;land that juts out into water|a peninsula;a low area between hills|a valley;a large area of flat land|a plain;a very dry area with little rain|a desert;a large area of trees|a forest",
+socMapDir:"the direction the sun rises|east;the direction the sun sets|west;the direction toward the North Pole|north;the direction toward the South Pole|south;between north and east|northeast;between south and west|southwest",
+socStates:"the largest state by area|Alaska;the smallest state by area|Rhode Island;the state with the most people|California;the state shaped like a mitten|Michigan;the sunshine state|Florida;the lone star state|Texas;the last state to join|Hawaii;the first state to join|Delaware",
+socRivers:"the longest river in the United States|the Missouri;the river through the Grand Canyon|the Colorado;the longest river in the world|the Nile;the river through Egypt|the Nile;the largest river by volume|the Amazon;the river through Paris|the Seine;the river through London|the Thames",
+socGovRoles:"leads the country|the President;makes the laws|Congress;decides what laws mean|the Supreme Court;leads a state|the governor;leads a city|the mayor;leads the Senate|the Vice President",
+socRights:"the right to say what you think|freedom of speech;the right to worship as you choose|freedom of religion;the right to gather peacefully|freedom of assembly;the right to a fair trial|due process;the right to vote|suffrage",
+socNative:"grew corn, beans and squash together|the Three Sisters;a home made of buffalo hide|a tipi;a large communal house in the Northwest|a longhouse;a village built into a cliff|a cliff dwelling;a carved pole telling a family story|a totem pole",
+socExplore:"sailed west in 1492|Christopher Columbus;first to sail around the world's crew|Ferdinand Magellan;explored the Pacific Northwest for the US|Lewis and Clark;guided that expedition|Sacagawea;sailed for England to find a passage|Henry Hudson",
+socColonial:"the first lasting English colony|Jamestown;the ship the Pilgrims sailed on|the Mayflower;the agreement they signed|the Mayflower Compact;the colony founded for religious freedom|Pennsylvania;the meal shared with the Wampanoag|the first Thanksgiving",
+socRevolution:"the tax protest in Boston Harbor|the Boston Tea Party;the document declaring independence|the Declaration of Independence;the year it was signed|1776;the commander of the army|George Washington;the country that helped the colonies|France",
+socCivil:"the war between North and South|the Civil War;the president during it|Abraham Lincoln;the order freeing enslaved people|the Emancipation Proclamation;the amendment ending slavery|the 13th;where the war ended|Appomattox",
+socRights2:"refused to give up her bus seat|Rosa Parks;gave the I Have a Dream speech|Martin Luther King Jr.;led people to freedom on the Underground Railroad|Harriet Tubman;fought for women's right to vote|Susan B. Anthony;first Black Supreme Court justice|Thurgood Marshall",
+socEcon2:"what people make or grow to sell|goods;work people do for others|services;a person who buys|a consumer;a person who makes|a producer;spending less than you earn|saving;trading one thing for another|barter",
+socCitizen:"following the rules of your community|obeying laws;choosing leaders|voting;helping without being paid|volunteering;paying for shared services|taxes;speaking up for a change|petitioning",
+socWorld:"the largest country by area|Russia;the country with the most people|India;the longest wall in the world|the Great Wall of China;the largest hot desert|the Sahara;the highest mountain|Mount Everest;the largest rainforest|the Amazon",
+socHolidays:"remembers those who died in service|Memorial Day;celebrates the Declaration of Independence|Independence Day;honours all who served|Veterans Day;celebrates the harvest with family|Thanksgiving;marks the new year in many Asian cultures|Lunar New Year",
+socTimeline:"one hundred years|a century;ten years|a decade;one thousand years|a millennium;the years before a written record|prehistory;the study of the past|history;an object left behind by people|an artifact",
+socCommunity:"a place with many people and tall buildings|a city;a smaller settlement|a town;an area of farms and open land|the countryside;a neighbourhood outside a city|a suburb;people who live in one area|a community",
+socNeeds:"food, water and shelter|needs;toys and treats|wants;a place to live|shelter;something you must have to survive|a need;something nice to have|a want",
+socJobs:"puts out fires|a firefighter;treats sick people|a doctor;teaches in a school|a teacher;delivers letters|a postal worker;keeps a community safe|a police officer;grows food|a farmer",
+socSymbols2:"the pledge said to the flag|the Pledge of Allegiance;the building where Congress meets|the Capitol;the home of the President|the White House;the monument to the first president|the Washington Monument;the statue in New York Harbor|the Statue of Liberty",
+socMigration:"moving into a new country|immigration;moving out of a country|emigration;a person forced to flee danger|a refugee;the mixing of cultures|cultural exchange;the island where many arrived in New York|Ellis Island",
+/* ---- coding ---- */
+codeLoop:"repeats a fixed number of times|a for loop;repeats while something stays true|a while loop;stops a loop early|break;skips to the next turn of the loop|continue;a loop inside another loop|a nested loop;a loop that never ends|an infinite loop",
+codeCond:"runs when the test is true|if;runs when the test is false|else;tests another condition|else if;true only when both are true|and;true when either is true|or;flips true and false|not",
+codeVar:"a box with a name that holds a value|a variable;a value that never changes|a constant;giving a variable its first value|initialising;the kind of value a variable holds|its type;a name that describes what it holds|a good variable name",
+codeStr:"the number of characters|length;joining two strings|concatenation;a single character in a string|an index;making all letters capital|uppercase;cutting a piece out of a string|a substring",
+codeList:"the position of the first item|0;adding to the end|append;taking one out|remove;how many items there are|length;going through every item|iterating",
+codeErr:"the code will not run at all|a syntax error;the code runs but gives the wrong answer|a logic error;the code stops partway|a runtime error;checking your code step by step|debugging;a note to yourself in the code|a comment",
+codeAlgo:"a step-by-step set of instructions|an algorithm;plain words describing the steps|pseudocode;a picture of the steps|a flowchart;doing the same thing again|repetition;breaking a problem into smaller ones|decomposition;spotting what repeats|pattern recognition",
+codeWeb:"describes what is on a page|HTML;describes how a page looks|CSS;makes a page interactive|JavaScript;the address of a page|a URL;a program that shows web pages|a browser;a computer that sends pages out|a server",
+codeHw:"the brain of the computer|the CPU;short-term working memory|RAM;where files are kept when powered off|storage;what you see the output on|a monitor;what you type on|a keyboard;connects computers together|a network",
+codeSafe:"a long mix of letters and symbols|a strong password;a code sent to your phone as well|two-factor authentication;keeping software up to date|patching;a message pretending to be someone else|phishing;software that harms your computer|malware",
+codeSort:"putting things in order smallest first|ascending;largest first|descending;comparing two at a time and swapping|a bubble sort;splitting a list in half to search|a binary search;checking each item one by one|a linear search",
+codeFunc:"a named block you can reuse|a function;what you give a function|an argument;what a function gives back|a return value;using a function|calling it;a function calling itself|recursion",
+codeNum:"base 2, only 0 and 1|binary;base 10, the usual one|decimal;base 16, uses letters too|hexadecimal;a single 0 or 1|a bit;eight of them together|a byte",
+codeInput:"information going into a program|input;what the program gives back|output;where a program keeps data while running|memory;a value typed by the user|user input;showing something on screen|printing",
+/* ---- art and music ---- */
+artMedium:"paint mixed with water|watercolour;thick paint that dries slowly|oil paint;coloured sticks that smudge|pastels;shaping wet earth|clay;cutting and gluing paper|collage;drawing with a soft black stick|charcoal",
+artLine:"a line that goes straight across|horizontal;a line that goes straight up|vertical;a slanted line|diagonal;a line that bends smoothly|curved;a line with sharp turns|zigzag;a line that spirals inward|spiral",
+artShape:"a shape with three sides|a triangle;a shape with four equal sides|a square;a round shape|a circle;a shape found in nature|an organic shape;a shape made with a ruler|a geometric shape;a shape with many sides|a polygon",
+artPerspective:"things far away look smaller|perspective;the line where sky meets ground|the horizon;the point where lines meet in the distance|the vanishing point;what is closest to the viewer|the foreground;what is furthest away|the background",
+artFamous:"painted the Mona Lisa|Leonardo da Vinci;painted Starry Night|Vincent van Gogh;painted many self-portraits with flowers in her hair|Frida Kahlo;made large paintings by dripping|Jackson Pollock;sculpted David|Michelangelo;painted water lilies|Claude Monet",
+artStyle2:"art that does not show real objects|abstract;art made of small tiles|mosaic;art printed from a carved block|printmaking;art made to be seen from all sides|sculpture;a picture of a person|a portrait;a picture of the land|a landscape",
+artTools2:"holds paper at an angle|an easel;mixes paint on it|a palette;used for smooth clay edges|a sponge;makes even circles|a compass;lifts pencil marks|a kneaded eraser",
+artColour2:"colours that sit opposite each other|complementary;colours that sit beside each other|analogous;a colour with white added|a tint;a colour with black added|a shade;how bright or dull a colour is|intensity;the name of a colour|hue",
+musNote2:"the symbol that shows pitch on the staff|the clef;five lines music is written on|the staff;the mark at the start showing beats per bar|the time signature;a curved line joining two notes|a tie;a dot after a note|adds half its length again",
+musRhythm:"the steady pulse you clap to|the beat;how the beats are grouped|the metre;a pattern of long and short notes|the rhythm;the speed of the music|the tempo;a silence in the music|a rest",
+musVoice:"the highest singing voice|soprano;below soprano|alto;the higher male voice|tenor;the lowest singing voice|bass;singing without instruments|a cappella;many voices singing together|a choir",
+musGenre:"music written for orchestras long ago|classical;music with improvised solos|jazz;music with a strong backbeat and guitars|rock;music from a country's traditions|folk;music with spoken rhymes over a beat|hip hop",
+musForm:"a section that repeats between verses|the chorus;the part that tells the story|the verse;a short instrumental opening|the intro;a contrasting middle section|the bridge;the very end|the outro",
+musInstr2:"played by drawing a bow across strings|the violin;played by pressing keys|the piano;played by blowing across a hole|the flute;played by hitting with sticks|the drums;played by plucking strings|the guitar;the largest string instrument|the double bass",
+musDynamic:"very soft|pianissimo;soft|piano;loud|forte;very loud|fortissimo;getting louder|crescendo;getting softer|diminuendo",
+musCompose:"wrote symphonies while going deaf|Beethoven;wrote music as a small child|Mozart;wrote the Four Seasons|Vivaldi;wrote many pieces for organ|Bach;wrote The Nutcracker|Tchaikovsky",
+/* ---- life skills ---- */
+lifeHealth:"washing before you eat|handwashing;how many hours of sleep a child needs|9 to 12;moving your body every day|exercise;drinking enough of this|water;brushing these twice a day|your teeth;covering this when you cough|your mouth",
+lifeFood:"foods that help you grow|protein;foods that give quick energy|carbohydrates;the group fruit belongs to|fruit;how many food groups there are|5;eating a mix from every group|a balanced meal;the label showing what is inside|nutrition facts",
+lifeKitchen:"used to measure small amounts|a teaspoon;used to measure liquid|a measuring jug;used to turn food in a pan|a spatula;always ask an adult before using this|the stove;wash these before eating them|fruit and vegetables",
+lifeClean:"putting things back where they belong|tidying;wiping a surface|cleaning;sorting paper and plastic|recycling;food scraps that break down|compost;taking rubbish out|the bin",
+lifeTimeMgt:"doing the most important thing first|prioritising;a list of what to do|a to-do list;the time something is due|a deadline;breaking a big job into pieces|chunking;putting things off|procrastinating",
+lifeMoney2:"money you get regularly|income;money you put aside|savings;money you owe|debt;the price plus tax|the total;money left after spending|the balance;a plan for your money|a budget",
+lifeShop:"the price for one item|the unit price;buying more for less each|bulk;money taken off the price|a discount;proof of what you bought|a receipt;giving something back to the shop|a return",
+lifeSafety2:"what to dial in an emergency in the US|911;where to meet if there is a fire|the meeting point;what to wear when cycling|a helmet;look this way before crossing|both ways;never do this with a stranger|go with them",
+lifeFirstAid:"what to put on a small cut|a plaster;what to do for a burn|cool it with water;what to do if someone is choking|get an adult straight away;what to put on a bump|something cold;where the first aid kit should be|somewhere everyone knows",
+lifeSocial:"listening without interrupting|good listening;saying how you feel calmly|using I statements;taking turns in a game|fair play;saying sorry and meaning it|apologising;asking before you borrow|permission",
+lifeDigital:"treating people kindly online|digital citizenship;a message meant to hurt|cyberbullying;telling an adult about it|reporting;checking if something is true|fact-checking;how long you spend on screens|screen time",
+lifeSchool:"reading it once more the next day|reviewing;asking when you do not understand|getting help;writing down what you must do|taking notes;a quiet place to work|a study space;doing a little every day|a routine",
+lifeCalendar:"how many days in a week|7;how many months in a year|12;the day after Tuesday|Wednesday;the month after June|July;how many days in a leap year|366",
+lifeMeasureU:"how tall you are|height;how heavy something is|weight;how hot or cold|temperature;how long something takes|duration;how far apart two places are|distance",
+lifeWeather2:"wear this when it rains|a raincoat;wear these in the snow|boots;wear this in strong sun|a hat and sunscreen;check this before going out|the forecast;go inside during this|a thunderstorm",
+lifeHome:"a plan for what you will eat|a meal plan;a list of what to buy|a shopping list;where letters arrive|the mailbox;turn these off when you leave|the lights;lock this when you go out|the door",
+/* ---- topping up to 75 ---- */
+sciLight:"bounces off a mirror|reflection;bends going into water|refraction;blocked light makes this|a shadow;light we can see|visible light;splits white light into colours|a prism",
+sciSound:"how high or low a sound is|pitch;how loud a sound is|volume;what sound travels through|a medium;sound bouncing back|an echo;what makes sound|vibration",
+sciEcosys:"all the living things in an area|a community;living and non-living together|an ecosystem;where an animal lives|its habitat;the job an animal does|its niche;two species helping each other|symbiosis",
+sciAdapt:"a thick coat for the cold|an adaptation;blending into the background|camouflage;sleeping through winter|hibernation;travelling with the seasons|migration;a beak shaped for its food|a specialised beak",
+spaFruit:"manzana|apple;plátano|banana;fresa|strawberry;uva|grape;sandía|watermelon;piña|pineapple;limón|lemon;melocotón|peach",
+spaNumbers3:"ciento uno|one hundred and one;doscientos|two hundred;quinientos|five hundred;mil|one thousand;primero|first;segundo|second;tercero|third",
+spaTime:"la hora|the hour;el minuto|the minute;hoy|today;mañana|tomorrow;ayer|yesterday;ahora|now;siempre|always;nunca|never",
+spaCommon:"sí|yes;no|no;tal vez|maybe;mucho|a lot;poco|a little;bien|well;mal|badly;también|also",
+spaFamily2:"esposo|husband;esposa|wife;bebé|baby;nieto|grandson;nieta|granddaughter;sobrino|nephew;sobrina|niece",
+codeGame:"the rules that decide who wins|game logic;what the player controls|the character;something that blocks the player|an obstacle;points you collect|the score;how many tries you get|lives",
+codeData2:"information collected|data;a picture of data|a chart;the middle value|the median;the most common value|the mode;organising data into groups|sorting",
+artCraft:"folding paper into shapes|origami;joining fabric with thread|sewing;weaving strands together|braiding;pressing shapes into clay|stamping;tying knots in cord|macramé",
+lifeGarden:"what a seed needs to sprout|water and warmth;where roots grow|the soil;what leaves need from the sky|sunlight;pulling out unwanted plants|weeding;giving plants water|watering",
+socMoney:"the money used in the United States|the dollar;the money used in most of Europe|the euro;the money used in Japan|the yen;the money used in the United Kingdom|the pound;swapping one currency for another|exchange",
+socLaw:"a rule everyone must follow|a law;the person who decides in court|a judge;twelve people who decide a verdict|a jury;breaking a law|a crime;the punishment for breaking one|a penalty",
+artPattern:"a shape that repeats|a pattern;the same on both sides|symmetry;a repeated unit in a row|a border;a pattern that grows smaller|a fractal;a shape turned around a point|rotation",
+artSpace:"the space objects take up|positive space;the empty space around them|negative space;how big things are compared to each other|proportion;where things sit on the page|composition;what draws your eye first|the focal point",
+codeFile:"a picture file|.png;a text file|.txt;a web page file|.html;a folder that holds files|a directory;saving your work|writing to a file",
+codeNet:"the worldwide network|the internet;a page address|a URL;sending a message instantly|chat;a place files are stored online|the cloud;how fast data moves|bandwidth",
+lifeTravel:"a plan of where you are going|an itinerary;how you get there|transport;what you carry your things in|luggage;the time you must arrive|the departure time;a paper letting you travel|a ticket",
+lifeChores:"washing dirty plates|the dishes;putting clothes in the machine|the laundry;removing dust|dusting;cleaning the floor|sweeping;making your bed|tidying your room",
+spaSchool2:"examen|exam;tarea|homework;nota|grade;pregunta|question;respuesta|answer;clase|class;recreo|recess",
+spaBody2:"corazón|heart;estómago|stomach;espalda|back;dedo|finger;rodilla|knee;hombro|shoulder;cuello|neck",
+sciSpace:"a ball of burning gas|a star;a rock orbiting the sun|an asteroid;a ball of ice and dust with a tail|a comet;a rock that hits the ground|a meteorite;a group of stars making a shape|a constellation",
+sciBody2:"carries blood away from the heart|an artery;carries blood back to the heart|a vein;the tiny tubes between them|capillaries;what blood carries to cells|oxygen;what the lungs breathe out|carbon dioxide",
+spaAnimals2:"tigre|tiger;jirafa|giraffe;mono|monkey;serpiente|snake;tortuga|turtle;pato|duck;abeja|bee;araña|spider",
+spaColours2:"dorado|golden;plateado|silver;turquesa|turquoise;beige|beige;violeta|violet;celeste|sky blue",
+codeMath:"adds two numbers|the plus sign;finds what is left over|the modulo;raises to a power|the exponent;makes a whole number|rounding;picks an unpredictable value|random",
+codeSteps:"the first thing a program does|it starts;what happens in order|sequence;doing something only sometimes|selection;doing something again|iteration;the last thing a program does|it ends",
+artColourMood:"colours that feel calm|blues and greens;colours that feel energetic|reds and oranges;colours that feel gentle|pastels;colours that feel serious|dark and muted;colours that feel cheerful|bright and warm",
+artDisplay:"where art is shown to the public|a gallery;a building holding many works|a museum;the border around a picture|a frame;a card naming the work|a label;a group of works shown together|an exhibition",
+lifeEmotions:"noticing how you feel|self-awareness;calming yourself down|self-regulation;understanding how others feel|empathy;bouncing back from a setback|resilience;keeping going when it is hard|perseverance",
+lifeGoals:"something you want to achieve|a goal;a small step toward it|a milestone;how you know you got there|success criteria;what might get in the way|an obstacle;checking how far you have come|reviewing progress",
+spaVerbs2:"abrir|to open;cerrar|to close;empezar|to begin;terminar|to finish;buscar|to look for;encontrar|to find;ayudar|to help",
+spaHouse2:"techo|roof;suelo|floor;pared|wall;escalera|stairs;llave|key;espejo|mirror",
+artPrint:"a stamp cut from a block|a block print;a picture pressed from a plate|an etching;spraying through a cut shape|a stencil;pressing a shape into soft material|an impression;the copy that comes out|a print",
+artFabric:"cloth dyed with tied knots|tie-dye;pieces sewn into a pattern|a quilt;thread stitched into a picture|embroidery;wool looped with hooks|crochet;strands crossed on a loom|weaving",
+lifeSkills2:"reading a label before you buy|checking ingredients;comparing two prices|value for money;keeping a receipt|proof of purchase;asking for help in a shop|speaking up;planning before you go|making a list",
+lifeSafety3:"cross only when this is showing|the green signal;wear this in a car|a seatbelt;wear this on a scooter|a helmet;walk on this side of the road|facing traffic;do this before opening a door|check who it is"
 };
 const B_I18N={};
 function loadBank(lang,obj){B_I18N[lang]=Object.assign(B_I18N[lang]||{},obj);}
@@ -2577,6 +2757,196 @@ S("code",8,"Trace a nested loop","seqG",{});
 S("art",7,"Instrument families (harder)","pairsR",{t:"instrument",q:"Which family does a {} instrument belong to?"});
 S("life",7,"Budget planning","lifeBudgetCalc",{});
 S("life",8,"Compare loan costs","simpleint",{});
+
+const SOC2=[
+ ["socGeo",3,"Landforms","What do you call {}?","What is {}?"],
+ ["socMapDir",2,"Directions","Which direction is {}?","What is {}?"],
+ ["socStates",4,"State facts","Which state is {}?","Describe {}."],
+ ["socRivers",5,"Rivers of the world","Which river is {}?","Where is {}?"],
+ ["socGovRoles",4,"Who does what in government","Who {}?","What does {} do?"],
+ ["socRights",5,"Rights and freedoms","What do you call {}?","What is {}?"],
+ ["socNative",4,"Native American cultures","What do you call {}?","What is {}?"],
+ ["socExplore",5,"Explorers","Who {}?","What is {} known for?"],
+ ["socColonial",5,"Colonial America","What do you call {}?","What is {}?"],
+ ["socRevolution",5,"The American Revolution","What do you call {}?","What is {}?"],
+ ["socCivil",5,"The Civil War","What do you call {}?","What is {}?"],
+ ["socRights2",5,"Civil rights leaders","Who {}?","What is {} known for?"],
+ ["socEcon2",3,"Goods and services","What do you call {}?","What is {}?"],
+ ["socCitizen",3,"Being a citizen","What do you call {}?","What is {}?"],
+ ["socWorld",6,"World records in geography","Which is {}?","What is {}?"],
+ ["socHolidays",2,"Holidays and what they mark","Which holiday {}?","What does {} mark?"],
+ ["socTimeline",4,"Talking about time","What do you call {}?","What is {}?"],
+ ["socCommunity",1,"Kinds of communities","What do you call {}?","What is {}?"],
+ ["socNeeds",1,"Needs and wants","What do you call {}?","What is {}?"],
+ ["socJobs",1,"Community helpers","Who {}?","What does {} do?"],
+ ["socSymbols2",2,"More American symbols","What do you call {}?","What is {}?"],
+ ["socMigration",6,"Moving and migration","What do you call {}?","What is {}?"]
+];
+SOC2.forEach(([tb,g,name,q1,q2])=>{
+  S("soc",g,name,"pairs",{t:tb,q:q1});
+  S("soc",g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
+
+const CODE2=[
+ ["codeLoop",5,"Loops","Which loop {}?","What does {} do?"],
+ ["codeCond",5,"Conditionals","Which one {}?","What does {} mean?"],
+ ["codeVar",4,"Variables","What do you call {}?","What is {}?"],
+ ["codeStr",6,"Working with text","What do you call {}?","What is {}?"],
+ ["codeList",6,"Lists and arrays","What is {}?","What does {} mean?"],
+ ["codeErr",5,"Errors and debugging","What do you call it when {}?","What is {}?"],
+ ["codeAlgo",4,"Algorithms and thinking","What do you call {}?","What is {}?"],
+ ["codeWeb",6,"How the web works","Which one {}?","What is {}?"],
+ ["codeHw",4,"Parts of a computer","Which part is {}?","What does {} do?"],
+ ["codeSafe",5,"Staying safe with computers","What do you call {}?","What is {}?"],
+ ["codeSort",7,"Sorting and searching","What do you call {}?","What is {}?"],
+ ["codeFunc",6,"Functions","What do you call {}?","What is {}?"],
+ ["codeNum",6,"Number systems","Which one is {}?","What is {}?"],
+ ["codeInput",4,"Input and output","What do you call {}?","What is {}?"]
+];
+CODE2.forEach(([tb,g,name,q1,q2])=>{
+  S("code",g,name,"pairs",{t:tb,q:q1});
+  S("code",g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
+[["Count how many times a loop runs",5,{max:5}],["Loop runs with bigger numbers",6,{max:12}],
+ ["Loop runs counting by 2s",6,{max:12,step:2}],["Loop runs counting by 3s",7,{max:15,step:3}]]
+ .forEach(([n,g,p])=>S("code",g,n,"loopCount",p));
+S("code",5,"Boolean expressions","boolExpr",{});
+S("code",7,"Harder boolean expressions","boolExpr",{hard:true});
+S("code",6,"Binary to decimal (small)","binaryN",{dir:"toDec",max:15});
+S("code",6,"Decimal to binary (small)","binaryN",{dir:"toBin",max:15});
+S("code",7,"Binary to decimal (larger)","binaryN",{dir:"toDec",max:255});
+S("code",7,"Decimal to binary (larger)","binaryN",{dir:"toBin",max:255});
+S("code",6,"Trace a variable","varTrace",{});
+
+const ART2=[
+ ["artMedium",3,"Art materials","Which material is {}?","What is {}?"],
+ ["artLine",2,"Kinds of line","What do you call {}?","What is {}?"],
+ ["artShape",2,"Shapes in art","What do you call {}?","What is {}?"],
+ ["artPerspective",5,"Perspective and depth","What do you call it when {}?","What is {}?"],
+ ["artFamous",6,"Famous artists","Who {}?","What is {} known for?"],
+ ["artStyle2",5,"Kinds of artwork","What do you call {}?","What is {}?"],
+ ["artTools2",3,"More art tools","Which tool {}?","What is {} for?"],
+ ["artColour2",4,"More colour theory","What do you call {}?","What is {}?"],
+ ["musNote2",4,"Reading the staff","What do you call {}?","What is {}?"],
+ ["musRhythm",3,"Rhythm and beat","What do you call {}?","What is {}?"],
+ ["musVoice",5,"Singing voices","What do you call {}?","What is {}?"],
+ ["musGenre",6,"Kinds of music","Which kind of music is {}?","What is {}?"],
+ ["musForm",5,"Parts of a song","What do you call {}?","What is {}?"],
+ ["musInstr2",3,"How instruments are played","Which instrument is {}?","How is {} played?"],
+ ["musDynamic",5,"Loud and soft","Which term means {}?","What does {} mean?"],
+ ["musCompose",6,"Composers","Who {}?","What is {} known for?"]
+];
+ART2.forEach(([tb,g,name,q1,q2])=>{
+  S("art",g,name,"pairs",{t:tb,q:q1});
+  S("art",g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
+S("art",4,"Beats in a bar","musBeats",{});
+S("art",5,"Count the beats","musBeats",{hard:true});
+S("art",3,"Mixing colours in practice","pairsR",{t:"colormix",q:"Which two colours make {}?"});
+S("art",6,"Note values in 4/4","pairsR",{t:"noteval",q:"Which note lasts {}?"});
+
+const LIFE2=[
+ ["lifeHealth",1,"Looking after yourself","What do you call {}?","What is {}?"],
+ ["lifeFood",3,"Food and nutrition","What do you call {}?","What is {}?"],
+ ["lifeKitchen",3,"In the kitchen","What is {}?","What is {} used for?"],
+ ["lifeClean",1,"Keeping things tidy","What do you call {}?","What is {}?"],
+ ["lifeTimeMgt",4,"Managing your time","What do you call {}?","What is {}?"],
+ ["lifeMoney2",4,"More money words","What do you call {}?","What is {}?"],
+ ["lifeShop",5,"Shopping sense","What do you call {}?","What is {}?"],
+ ["lifeSafety2",2,"Staying safe out and about","What is {}?","When would you need {}?"],
+ ["lifeFirstAid",4,"Simple first aid","What do you do about {}?","When would you {}?"],
+ ["lifeSocial",2,"Getting on with people","What do you call {}?","What is {}?"],
+ ["lifeDigital",5,"Life online","What do you call {}?","What is {}?"],
+ ["lifeSchool",4,"How to study","What do you call {}?","What is {}?"],
+ ["lifeCalendar",2,"Days and months","What is {}?","What has {}?"],
+ ["lifeMeasureU",2,"What we measure","What do you call {}?","What is {}?"],
+ ["lifeWeather2",1,"Dressing for the weather","What should you do about {}?","When do you need {}?"],
+ ["lifeHome",3,"Around the house","What do you call {}?","What is {}?"]
+];
+LIFE2.forEach(([tb,g,name,q1,q2])=>{
+  S("life",g,name,"pairs",{t:tb,q:q1});
+  S("life",g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
+S("life",4,"Work out the change","makeChange",{});
+S("life",5,"Work out the change (harder)","makeChange",{hard:true});
+S("life",6,"Split a bill","splitBill",{});
+S("life",5,"How long until it is due","daysUntil",{});
+
+const TOPUP=[
+ ["sci","sciLight",4,"Light","What do you call it when light {}?","What is {}?"],
+ ["sci","sciSound",4,"Sound","What do you call {}?","What is {}?"],
+ ["sci","sciEcosys",5,"Ecosystems","What do you call {}?","What is {}?"],
+ ["sci","sciAdapt",4,"How animals adapt","What do you call {}?","What is {}?"],
+ ["spa","spaFruit",3,"Fruit — Spanish to English","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["spa","spaNumbers3",5,"Bigger numbers and order","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["spa","spaTime",4,"Time words","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["spa","spaCommon",3,"Everyday words","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["spa","spaFamily2",4,"More family words","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["code","codeGame",4,"Making a game","What do you call {}?","What is {}?"],
+ ["code","codeData2",5,"Working with data","What do you call {}?","What is {}?"],
+ ["art","artCraft",3,"Crafts","What do you call {}?","What is {}?"],
+ ["life","lifeGarden",2,"Growing plants","What is {}?","When do you need {}?"]
+];
+TOPUP.forEach(([sub,tb,g,name,q1,q2])=>{
+  S(sub,g,name,"pairs",{t:tb,q:q1});
+  S(sub,g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
+/* a few more procedural ones to level the last gaps */
+[["Add within 5",1,{max:5}],["Add within 15",1,{max:15}]].forEach(([n,g,pp])=>S("life",g,"Money: "+n,"coins",{}));
+S("art",4,"Beats in a bar (mixed)","musBeats",{hard:true});
+S("code",6,"Loop runs counting by 5s","loopCount",{max:25,step:5});
+S("code",5,"Binary practice","binaryN",{dir:"toBin",max:31});
+S("life",4,"Change from a note","makeChange",{});
+S("spa",3,"Greetings again","pairsR",{t:"spGreet",q:"Which Spanish phrase means “{}”?"});
+
+const TOPUP2=[
+ ["soc","socMoney",4,"Money around the world","Which money is {}?","What is {}?"],
+ ["soc","socLaw",5,"Laws and courts","What do you call {}?","What is {}?"],
+ ["art","artPattern",3,"Pattern and symmetry","What do you call {}?","What is {}?"],
+ ["art","artSpace",5,"Space and composition","What do you call {}?","What is {}?"],
+ ["code","codeFile",4,"Files and folders","Which one is {}?","What is {}?"],
+ ["code","codeNet",5,"The internet","What do you call {}?","What is {}?"],
+ ["life","lifeTravel",4,"Going on a trip","What do you call {}?","What is {}?"],
+ ["life","lifeChores",1,"Jobs around the house","What do you call {}?","What is {}?"],
+ ["spa","spaSchool2",5,"School words","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["spa","spaBody2",5,"More body words","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["sci","sciSpace",5,"Space objects","What do you call {}?","What is {}?"],
+ ["sci","sciBody2",6,"Blood and breathing","Which one {}?","What is {}?"]
+];
+TOPUP2.forEach(([sub,tb,g,name,q1,q2])=>{
+  S(sub,g,name,"pairs",{t:tb,q:q1});
+  S(sub,g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
+S("life",5,"Split a bill (harder)","splitBill",{});
+S("life",3,"Days until something is due","daysUntil",{});
+S("art",5,"Note values again","musBeats",{});
+S("code",7,"Loop runs counting by 4s","loopCount",{max:20,step:4});
+
+const TOPUP3=[
+ ["spa","spaAnimals2",4,"More animals","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["spa","spaColours2",4,"More colours","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["code","codeMath",5,"Maths in code","Which one {}?","What does {} do?"],
+ ["code","codeSteps",4,"How a program runs","What do you call it when {}?","What is {}?"],
+ ["art","artColourMood",4,"Colour and mood","Which colours {}?","How do {} feel?"],
+ ["art","artDisplay",5,"Showing artwork","What do you call {}?","What is {}?"],
+ ["life","lifeEmotions",4,"Understanding feelings","What do you call {}?","What is {}?"],
+ ["life","lifeGoals",5,"Setting goals","What do you call {}?","What is {}?"]
+];
+TOPUP3.forEach(([sub,tb,g,name,q1,q2])=>{
+  S(sub,g,name,"pairs",{t:tb,q:q1});
+  S(sub,g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
+
+[["spa","spaVerbs2",5,"More verbs","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["spa","spaHouse2",5,"More house words","What does “{}” mean?","How do you say “{}” in Spanish?"],
+ ["art","artPrint",6,"Printmaking","What do you call {}?","What is {}?"],
+ ["art","artFabric",5,"Textile art","What do you call {}?","What is {}?"],
+ ["life","lifeSkills2",5,"Being a smart shopper","What do you call {}?","What is {}?"],
+ ["life","lifeSafety3",2,"Road and car safety","What should you do: {}?","When would you need {}?"]
+].forEach(([sub,tb,g,name,q1,q2])=>{
+  S(sub,g,name,"pairs",{t:tb,q:q1});
+  S(sub,g,name+" — the other way","pairsR",{t:tb,q:q2});
+});
 
 /* ---- MATH ---- */
 S("math","K","Count objects up to 10","count",{max:10});
@@ -3580,6 +3950,7 @@ function viewAccounts(){
       <div class="tabs" style="margin-bottom:16px">
         ${["kid","parent","admin"].map(r=>`<button aria-current="${gate.role===r}" onclick="gateRole('${r}')">${ROLE_EM[r]} ${roleName(r)}</button>`).join("")}
       </div>`}
+      ${typeof googleRow==="function"?googleRow(SOLO?BUILD:gate.role):""}
       <label class="field"><span>${t("nameL")}</span><input id="newName" maxlength="22" placeholder="${adult?"e.g. Priya":"e.g. Ravi"}" autocomplete="off"></label>
       <label class="field"><span>${t("emailL")}</span><input id="email" type="email" autocomplete="username" placeholder="${adult?"you@example.com":"a grown-up's address is fine"}"></label>
       ${pwFields(t("passwordL"),t("pwAgain"))}
